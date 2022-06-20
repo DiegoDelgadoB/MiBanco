@@ -10,3 +10,42 @@ const config = {
 };
 
 const pool = new Pool(config);
+
+yargs.command("registrar", "Registrar nueva transferencia",{
+    descripcion: {
+        describe: 'Descripción de la transferencia',
+        demand: true,
+        alias: 'd'
+    },
+    monto: {
+        describe: 'Monto a transferir',
+        demand: true,
+        alias: 'm'
+    },
+    cuenta_origen: {
+        describe: 'Cuenta que envía el monto',
+        demand: true,
+        alias: 'co'
+    },
+    cuenta_destino: {
+        describe: 'Cuenta que recibe el monto',
+        demand: true,
+        alias: 'cd'
+    }
+}, async (argumentos) => { // Función asíncrona que registre una nueva transferencia mediante una transacción SQL.
+    let { descripcion, monto, cuenta_origen, cuenta_destino } = argumentos;
+    try {
+        await pool.query("BEGIN");
+
+        const descontar = {
+            text: "UPDATE cuentas SET saldo = saldo - $1 WHERE id = $2 RETURNING *",
+            values: [monto, cuenta_origen]
+        }
+        const resDescontar = await pool.query(descontar); 
+        
+        const acreditar = {
+            text: "UPDATE cuentas SET saldo = saldo - $1 WHERE id = $2 RETURNING *",
+            values: [monto, cuenta_destino]
+        }
+        const resAcreditar = await
+    }
