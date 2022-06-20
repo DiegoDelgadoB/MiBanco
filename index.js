@@ -47,5 +47,14 @@ yargs.command("registrar", "Registrar nueva transferencia",{
             text: "UPDATE cuentas SET saldo = saldo - $1 WHERE id = $2 RETURNING *",
             values: [monto, cuenta_destino]
         }
-        const resAcreditar = await
-    }
+        const resAcreditar = await pool.query(acreditar);
+
+        const nuevaTransferencia = {
+            text: "INSERT INTO transferencias (descripcion, fecha, monto, cuenta_origen, cuenta_destino) values ($1, CURRENT_TIMESTAMP, $2, $3, $4) RETURNING *",
+            values: [descripcion, monto, cuenta_origen, cuenta_destino]
+        }
+
+        const resNuevaTransferencia = await pool.query(nuevaTransferencia);
+        console.table(resNuevaTransferencia.rows); // Mostrar por consola la última transferencia registrada.
+
+        
